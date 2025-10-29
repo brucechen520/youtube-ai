@@ -17,6 +17,7 @@ const fastify = require('fastify')({
     },
 });
 
+fastify.setErrorHandler(require('../backend/plugins/error-hander'));
 
 // ----------------------------------------------------------
 // 啟動伺服器

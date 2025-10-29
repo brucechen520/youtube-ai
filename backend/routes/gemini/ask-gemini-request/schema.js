@@ -13,7 +13,7 @@ module.exports = {
 		default: {
 			$ref: 'error#',
 		},
-		201: {
+		200: {
 			type: 'object',
 			properties: {
 				response: { $ref: 'youtube#/properties/response' },

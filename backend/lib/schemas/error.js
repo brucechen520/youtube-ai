@@ -5,6 +5,14 @@ module.exports = {
 		error: {
 			type: 'string',
 		},
+        statusCode: {
+            type: 'integer',
+        },
+        name: {
+            type: 'string',
+        },
+        details: {
+        },
 		code: {
 			type: 'string',
 		},
