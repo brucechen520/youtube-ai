@@ -17,14 +17,11 @@ module.exports = function (config) {
 			return { 'label': logger.levels.labels[level] };
 		},
 		transport: {
-			targets: [
-				{
-					target: 'pino/file',
-					options: {
-						destination: 1,
-					},
-				},
-			],
+			target: 'pino-pretty',
+			options: {
+				translateTime: 'yyyy-mm-dd HH:MM:ss Z',
+				ignore: 'pid,hostname,label',
+			},
 			dedupe: true,
 			sync: true,
 		},

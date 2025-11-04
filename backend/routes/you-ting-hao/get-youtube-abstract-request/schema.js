@@ -7,6 +7,10 @@ module.exports = {
 				type: 'string',
 				minLength: 1,
 			},
+			url: {
+				type: 'string',
+				minLength: 1,
+			},
 			isGoogleSearch: {
 				type: 'boolean',
 				default: false,
@@ -20,7 +24,7 @@ module.exports = {
 		200: {
 			type: 'object',
 			properties: {
-				response: { $ref: 'youtube#/properties/response' },
+				response: {},
 			},
 		},
 	},

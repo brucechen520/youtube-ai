@@ -1,9 +1,11 @@
 module.exports = function (error, request, reply) {
-    if (error.validation) {
-        error.statusCode = 422;
-    }
+	if (error.validation) {
+		error.statusCode = 422;
+	}
 
-    reply.error = error;
+	request.log.error(error);
 
-    reply.send(error);
+	reply.error = error;
+
+	reply.send(error);
 };

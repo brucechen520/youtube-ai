@@ -18,6 +18,7 @@ const fastify = require('fastify')({
 });
 
 fastify.setErrorHandler(require('../backend/plugins/error-hander'));
+fastify.register(require('../backend/plugins/decorate-reply'));
 
 // ----------------------------------------------------------
 // 啟動伺服器
