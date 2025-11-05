@@ -1,7 +1,10 @@
-module.exports = async function (fastify) {
-	require('./lib/schemas')(fastify);
+import schema from './lib/schemas/index.js';
+import routes from './routes/index.js';
 
-	fastify.register(require('./routes/index'), { prefix: '/api/v1/' });
+export default async function (fastify) {
+	schema(fastify);
+
+	fastify.register(routes, { prefix: '/api/v1/' });
 
 	return fastify;
 };

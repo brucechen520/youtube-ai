@@ -1,7 +1,7 @@
-const isValidChannel = require('./is-valid-channel');
-const prepareTranscript = require('./prepare-transcript');
+import isValidChannel from './is-valid-channel.js';
+import prepareTranscript from './prepare-transcript.js';
 
-module.exports = [
+export default [
 	isValidChannel,
-    prepareTranscript,
+	prepareTranscript,
 ];

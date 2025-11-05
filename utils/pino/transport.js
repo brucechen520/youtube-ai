@@ -1,8 +1,8 @@
-const pino = require('pino');
+import pino from 'pino';
 
 let logger = null;
 
-module.exports = function (config) {
+export default function (config) {
 	if (logger !== null) {
 		return logger;
 	}

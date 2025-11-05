@@ -1,9 +1,10 @@
-const schema = require('./schema');
-const preHandler = require('./pre-handler');
-const handler = require('./handler');
+import schema from './schema.js';
+import preHandler from './pre-handler/index.js';
+import handler from './handler.js';
 
-module.exports = {
-	schema,
-	preHandler,
-	handler,
+// 使用 ESM 的 export default 導出物件
+export default {
+    schema,
+    preHandler,
+    handler,
 };

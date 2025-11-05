@@ -1,8 +1,8 @@
-const { generateYouTingHaoStructuredJson } = require('../../../services/gemini');
+import { generateYouTingHaoStructuredJson } from '../../../services/gemini.js';
 
-module.exports = async function (request, reply) {
+export default async function (request, reply) {
 	// 從回應中提取文字內容
-	const response = await generateYouTingHaoStructuredJson(request.body.prompt, { isGoogleSearch: request.body.isGoogleSearch});
+	const response = await generateYouTingHaoStructuredJson(request.body.prompt, { transcript: reply.locals.transcript});
 
 	console.log('-> 游廷皓的財經號角結構化文字生成結果：', response.content);
 

@@ -1,38 +1,43 @@
-const config = require('config');
-
-require('dotenv').config();
+import 'dotenv/config';
+import config from 'config';
+import Fastify from 'fastify';
+import { pinoLogger } from '../utils/pino/index.js';
+import ajvKeywords from 'ajv-keywords';
+import errorHandlerPlugin from '../backend/plugins/error-hander.js';
+import decorateReplyPlugin from '../backend/plugins/decorate-reply.js';
+import serverSartup from '../backend/server.js';
 
 // 初始化 Fastify 伺服器
-const fastify = require('fastify')({
-    bodyLimit: config.fastify.bodyLimit,
-    trustProxy: true,
-    loggerInstance: require('../utils/pino')(config.pino),
-    disableRequestLogging: true,
-    requestIdLogLabel: 'requestId',
-    requestIdHeader: 'x-request-id',
-    ajv: {
-        plugins: [
-            [require('ajv-keywords'), ['uniqueItemProperties', 'transform']],
-        ],
-    },
+const fastify = Fastify({
+	bodyLimit: config.fastify.bodyLimit,
+	trustProxy: true,
+	loggerInstance: pinoLogger(config.pino),
+	disableRequestLogging: true,
+	requestIdLogLabel: 'requestId',
+	requestIdHeader: 'x-request-id',
+	ajv: {
+		plugins: [
+			[ajvKeywords, ['uniqueItemProperties', 'transform']],
+		],
+	},
 });
 
-fastify.setErrorHandler(require('../backend/plugins/error-hander'));
-fastify.register(require('../backend/plugins/decorate-reply'));
+fastify.setErrorHandler(errorHandlerPlugin);
+fastify.register(decorateReplyPlugin);
 
 // ----------------------------------------------------------
 // 啟動伺服器
 // ----------------------------------------------------------
 const start = async () => {
-    try {
-        require('../backend/server')(fastify);
+	try {
+		serverSartup(fastify);
 
-        await fastify.listen({ port: 3000 });
-        console.log(`🚀 Fastify server running at http://localhost:3000`);
-    } catch (err) {
-        fastify.log.error(err);
-        process.exit(1);
-    }
+		await fastify.listen({ port: 3000 });
+		console.log(`🚀 Fastify server running at http://localhost:3000`);
+	} catch (err) {
+		fastify.log.error(err);
+		process.exit(1);
+	}
 };
 
 start();

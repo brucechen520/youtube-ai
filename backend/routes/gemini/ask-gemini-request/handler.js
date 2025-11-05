@@ -1,6 +1,6 @@
-const { generateText } = require('../../../services/gemini');
+import { generateText } from '../../../services/gemini.js';
 
-module.exports = async function (request, reply) {
+export default async function (request, reply) {
 	// 從回應中提取文字內容
 	const response = await generateText(request.body.prompt, { isGoogleSearch: request.body.isGoogleSearch });
 

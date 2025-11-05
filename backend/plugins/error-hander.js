@@ -1,4 +1,4 @@
-module.exports = function (error, request, reply) {
+export default function (error, request, reply) {
 	if (error.validation) {
 		error.statusCode = 422;
 	}

@@ -1,7 +1,7 @@
-const { isYouTingHaoChannel } = require('../../../../lib/youtube');
-const { UnprocessableEntityError } = require('../../../../lib/errors/api-error');
+import { isYouTingHaoChannel } from '../../../../lib/youtube/index.js';
+import { UnprocessableEntityError } from '../../../../lib/errors/api-error.js';
 
-module.exports = async function (request, reply) {
+export default async function (request, reply) {
 	const isValid = await isYouTingHaoChannel(request.body.url);
 
 	if (!isValid) {

@@ -1,7 +1,7 @@
 const REGEX_TOTP = '^\\d{6}$';
 const REGEX_PASSWORD_WITH_ONE_NUMBER_AND_ONE_ALPHABET = `^(?=.*[A-Za-z])(?=.*\\d)(?=.)[A-Za-z!@#$%^&*()_+\\-=\\[\\]{};':"\\|,.<>\\/?\\d]*$`;
 
-module.exports = {
+export default {
 	$id: 'common',
 	type: 'object',
 	properties: {

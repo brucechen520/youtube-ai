@@ -1,14 +1,14 @@
-const ytdl = require('@distube/ytdl-core');
-const { YoutubeTranscript } = require('youtube-transcript');
-const { PromptTemplate } = require('@langchain/core/prompts');
-const { LLMChain, SimpleSequentialChain } = require('langchain');
-const {
+import ytdl from '@distube/ytdl-core';
+import { fetchTranscript } from 'youtube-transcript-plus';
+// 修改後的程式碼 (使用非同步動態 import)
+import { PromptTemplate } from '@langchain/core/prompts';
+// import { LLMChain, SimpleSequentialChain } from 'langchain';
+import {
 	UnprocessableEntityError
-} = require('../errors/api-error');
+} from '../errors/api-error.js';
+import config from 'config';
 
-const {
-	you_ting_hao_youtube_channel
-} = require('config');
+const { you_ting_hao_youtube_channel } = config;
 
 async function isYouTingHaoChannel(url) {
 	const videoId = getYoutubeVideoId(url);
@@ -43,14 +43,30 @@ function getYoutubeVideoId(url) {
 }
 
 async function getYoutubeTranscript(videoId) {
-	const transcript = await YoutubeTranscript.fetchTranscript(videoId);
+	// 游庭皓的財經號角用這個套件無法爬到字幕逐字稿，逐字稿的做法先 pending
+	const transcript = await fetchTranscript(videoId, { lang: 'zh-TW' });
 
-    // todo: 處理 transcript，轉換成純文字
+	const transcriptText = transcript
+		.map(item => {
+			const minutes = Math.floor(item.offset / 60);
+			const seconds = item.offset % 60;
+			// 確保時間格式是 LLM 容易識別的 [MM:ss]
+			const timeString = `[${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}]`;
 
-	return transcript;
+			// 僅移除 [Music] 等標記，保留語音文字
+			const cleanText = item.text.replace(/\[.*?\]/g, '').trim();
+
+			// 使用 | 確保時間和文本的分隔
+			return `${timeString}|${cleanText}`;
+		})
+		.join(' ')
+		.replace(/(?:哦|啦|嘛|啊|誒|嗯|那|不過|當然|事實上|這個)\s*/g, '')
+		.trim();
+
+	return transcriptText;
 }
 
-module.exports = {
+export {
 	getYoutubeVideoId,
 	isYouTingHaoChannel,
 	getYoutubeTranscript,

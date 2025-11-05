@@ -1,8 +1,8 @@
-const {
+import {
 	ENUM_YOUTUBE_STATUS,
-} = require('../enums');
+} from '../enums/index.js';
 
-module.exports = {
+export default {
 	$id: 'youtube',
 	type: 'object',
 	properties: {

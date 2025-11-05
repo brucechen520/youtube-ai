@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	body: {
 		type: 'object',
 		required: ['prompt'],

@@ -1,10 +1,8 @@
 const { GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY_HERE' } = process.env;
-const { GoogleGenAI } = require('@google/genai');
-const { YouTubeTranscript } = require('youtube-transcript');
-const {
+import { GoogleGenAI } from '@google/genai';
+import {
 	InternalError,
-} = require('../lib/errors/api-error');
-const { properties } = require('../lib/schemas/youtube');
+} from '../lib/errors/api-error.js';
 const AI = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 // 檢查 API 金鑰的輔助函式
@@ -19,7 +17,7 @@ function checkApiKey() {
  * @param {string} prompt - 輸入給模型的提示詞。
  * @returns {Promise<string>} - 模型生成的純文字內容。
  */
-async function generateText(prompt, { model = 'gemini-2.5-flash', isGoogleSearch = false } = {}) {
+export async function generateText(prompt, { model = 'gemini-2.5-flash', isGoogleSearch = false } = {}) {
 	checkApiKey();
 	console.log('-> 執行：非結構化文字生成。');
 
@@ -44,9 +42,21 @@ async function generateText(prompt, { model = 'gemini-2.5-flash', isGoogleSearch
 	};
 }
 
-async function generateYouTingHaoStructuredJson(prompt, { model = 'gemini-2.5-flash', isGoogleSearch = false } = {}) {
+export async function generateYouTingHaoStructuredJson(prompt, { model = 'gemini-2.5-flash', transcript = '' } = {}) {
 	checkApiKey();
 	console.log('-> 執行：游廷皓的財經號角結構化文字生成。');
+	const finalPrompt = `
+		您是一位資深的財經分析師。
+		依照影片逐字稿將所有重點資訊根據指定的 JSON Schema **嚴格**輸出。
+
+		通用指令: ${prompt}
+
+		---
+		影片逐字稿: ${transcript}
+	`;
+
+	console.log('-> 最終提示詞內容: ', finalPrompt);
+
 	const responseSchema = {
 		type: 'object',
 		properties: {
@@ -54,16 +64,16 @@ async function generateYouTingHaoStructuredJson(prompt, { model = 'gemini-2.5-fl
 				type: 'object',
 				description: '影片的基本資訊。',
 				properties: {
-					title: { type: 'string' },
-					channel_name: { type: 'string' },
-					url: { type: 'string' },
-					publish_date: { type: 'string', format: 'date' }
+					title: { type: 'string', description: '影片的標題' },
+					channel_name: { type: 'string', description: '頻道名稱' },
+					url: { type: 'string', description: '影片網址' },
+					publish_date: { type: 'string', format: 'date', description: '影片發布日期，格式為 YYYY-MM-DD' },
 				},
 				required: ['title', 'channel_name', 'url', 'publish_date']
 			},
 			main_themes: {
 				type: 'array',
-				description: '影片討論的每個主要財經/政治議題。',
+				description: '影片討論的每個主要財經議題，給我3-20個主要議題。',
 				items: {
 					type: 'object',
 					properties: {
@@ -80,9 +90,9 @@ async function generateYouTingHaoStructuredJson(prompt, { model = 'gemini-2.5-fl
 				items: {
 					type: 'object',
 					properties: {
-						indicator: { type: 'string' },
-						value: { type: 'string' },
-						unit: { type: 'string' },
+						indicator: { type: 'string', description: '經濟指標或數據的名稱，例如「GDP 成長率」、「失業率」等。' },
+						value: { type: 'string', description: '該指標的具體數值或百分比。' },
+						unit: { type: 'string', description: '數值的單位，例如「百分比」、「美元」等。' },
 						note: { type: 'string', description: '數據的關鍵摘要或背景解釋。' },
 						time: { type: 'string', description: '提到此數據的時間點，格式為 [HH:MM:SS]。' }
 					},
@@ -95,7 +105,7 @@ async function generateYouTingHaoStructuredJson(prompt, { model = 'gemini-2.5-fl
 				items: {
 					type: 'object',
 					properties: {
-						term: { type: 'string' },
+						term: { type: 'string', description: '經濟學術語或概念的名稱。' },
 						definition: { type: 'string', description: '該術語的清晰定義或解釋。' },
 						time: { type: 'string', description: '術語解釋開始的時間點，格式為 [HH:MM:SS]。' }
 					},
@@ -108,8 +118,8 @@ async function generateYouTingHaoStructuredJson(prompt, { model = 'gemini-2.5-fl
 				items: {
 					type: 'object',
 					properties: {
-						title: { type: 'string' },
-						content: { type: 'string' },
+						title: { type: 'string', description: '笑話的標題。' },
+						content: { type: 'string', description: '笑話的內容。' },
 						time: { type: 'string', description: '笑話開始的時間點，格式為 [HH:MM:SS]。' }
 					},
 					required: ['title', 'content', 'time'],
@@ -121,7 +131,7 @@ async function generateYouTingHaoStructuredJson(prompt, { model = 'gemini-2.5-fl
 	// 呼叫 Gemini API 進行內容生成
 	const response = await AI.models.generateContent({
 		model, // 選擇您想使用的模型
-		contents: prompt,
+		contents: finalPrompt,
 		config: {
 			responseMimeType: 'application/json',
 			responseSchema,
@@ -132,8 +142,3 @@ async function generateYouTingHaoStructuredJson(prompt, { model = 'gemini-2.5-fl
 		content: response.text,
 	}
 }
-
-module.exports = {
-	generateText,
-	generateYouTingHaoStructuredJson,
-};

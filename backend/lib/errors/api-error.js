@@ -83,7 +83,7 @@ class ExternalServiceError extends ApiError {
   }
 }
 
-module.exports = {
+export {
     ApiError,
     BadRequestError,
     NotFoundError,
